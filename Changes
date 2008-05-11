@@ -1,0 +1,6 @@
+Revision history for Perl extension PJVM.
+
+0.01  Sat May 10 17:01:13 2008
+	- original version; created by h2xs 1.23 with options
+		-X -b 5.8.1 -n PJVM
+

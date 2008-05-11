@@ -1,0 +1,79 @@
+package PJVM::ClassLoader;
+
+use strict;
+use warnings;
+
+use File::Spec;
+use File::Slurp qw(slurp);
+
+use IO::Scalar;
+
+use PJVM::Class;
+
+our @ISA = qw(Exporter);
+
+use Object::Tiny qw(
+    classpath
+);
+
+sub new {
+    my ($pkg, $args) = @_;
+    
+    $args = {} unless ref $args eq "HASH";
+    
+    my $classpath;
+    if ($args->{classpath}) {
+        die "argument 'classpath' must be an array reference" unless ref $args->{classpath} eq "ARRAY";
+        $classpath = $args->{classpath};
+    }
+    
+    my $self = bless {
+        classpath => $classpath,
+    }, $pkg;
+    
+    return $self;
+}
+
+sub load_class {
+    my ($self, $fqcn) = @_;
+    
+    # Find the class to load
+    my $path;
+    for my $cp (@{$self->classpath}) {
+        my $pt = File::Spec->catfile($cp, "${fqcn}.class");
+        if (-e $pt) {
+            $path = $pt;
+            last;
+        }
+    }
+    
+    die "Can't find '${fqcn}.class' in my classpath" unless $path;
+    
+    my $data = slurp $path, binmode => ':raw';
+    die "Class '${fqcn}.class' appears to be empty.. FAIL" unless $data;
+    
+    my $class = $self->read_class($data);
+    
+    return $class;
+}
+
+sub read_class {
+    my ($self, $data) = @_;
+    
+    my $io = IO::Scalar->new(\$data);
+    
+    return PJVM::Class->new_from_io($io);
+}
+
+1;
+__END__
+
+=head1 NAME
+
+PJVM::ClassLoader -
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 INTERFACE
