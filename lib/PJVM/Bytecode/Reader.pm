@@ -3,11 +3,15 @@ package PJVM::Bytecode::Reader;
 use strict;
 use warnings;
 
+use List::MoreUtils qw(any);
+
 sub _index_byte     { ${$_[1]} += 1; return (shift @{$_[0]}); }
 
 sub _index_short    { ${$_[1]} += 2; my ($i1, $i2) = splice @{$_[0]}, 0, 2; return ($i1 << 8 | $i2); }
 
 sub _byte           { ${$_[1]} += 1; return (shift @{$_[0]}); }
+
+sub _short          { ${$_[1]} += 2; my ($i1, $i2) = splice @{$_[0]}, 0, 2; return ($i1 << 8 | $i2); }
 
 sub _offset_short   { ${$_[1]} += 2; my ($o1, $o2) = splice @{$_[0]}, 0, 2; return ($o1 << 8 | $o2); }
 
@@ -27,6 +31,13 @@ sub _index_short_count_0 {
     my ($i1, $i2, $count, undef) = splice @{$_[0]}, 0, 4;
     return ($i1 << 8 | $i2, $count);
 }
+
+sub _index_short_count {
+    ${$_[1]} += 3; 
+    my ($i1, $i2, $count) = splice @{$_[0]}, 0, 3;
+    return ($i1 << 8 | $i2, $count);
+}
+
 
 my %Op_transformation = (
     0x19 => \&_index_byte, # aload
@@ -107,8 +118,73 @@ my %Op_transformation = (
         
         return ($default, @pairs);
     },
-
     0x37 => \&_index_byte, # lstore
+    
+    0xc5 => \&_index_short_count, # multianewarray
+    
+    0xbb => \&_index_short, # new
+    0xbc => \&_byte, # newarray 
+    
+    0xb5 => \&_index_short, # putfield
+    0xb3 => \&_index_short, # putstatic
+    
+    0xa9 => \&_index_byte, # ret
+    
+    0x11 => \&_short, # sipush
+
+    0xaa => sub { # tableswitch
+        my ($ops, $ix) = @_;
+        my $pad = 3 - ($$ix - 1) % 4;
+        if ($pad) {
+            splice @$ops, 0, $pad;
+            $$ix += $pad;
+        };
+        
+        # default offset
+        my ($d1, $d2, $d3, $d4) = splice @$ops, 0, 4;
+        $$ix += 4;
+        my $default = ($d1 << 24 | $d2 << 16 | $d3 << 8 | $d4);
+
+        # low <int>:
+        my ($l1, $l2, $l3, $l4) = splice @$ops, 0, 4;
+        $$ix += 4;
+        my $low = ($l1 << 24 | $l2 << 16 | $l3 << 8 | $l4);
+
+        my ($h1, $h2, $h3, $h4) = splice @$ops, 0, 4;
+        $$ix += 4;
+        my $high = ($h1 << 24 | $h2 << 16 | $h3 << 8 | $h4);
+        
+        my $jump_offsets = $high - $low + 1;
+        my @jump_offsets;
+        if ($jump_offsets) {
+            my ($o1, $o2, $o3, $o4) = splice @$ops, 0, 4;
+            $$ix += 4;
+            push @jump_offsets, ($o1 << 24 | $o2 << 16 | $o3 << 8 | $o4);
+        }
+        
+        return ($default, $low, $high, @jump_offsets);
+    },
+    
+    0xc4 => sub { # wide
+        my ($ops, $ix) = @_;
+        
+        my $op = shift @$ops;
+        $$ix++;
+        
+        if ($op == 0x84) {
+            my ($i1, $i2, $c1, $c2) = splice @$ops, 0, 4;
+            $$ix += 4;
+            return ($op, $i1 << 8 | $i2, $c1 << 8 | $c2);            
+        }
+        elsif (any { $_ == $op } (0x15, 0x36, 0x17, 0x38, 0x19, 0x3a, 0x16, 0x37, 0x18, 0x39, 0xa9)) {
+            my ($i1, $i2) = splice @$ops, 0, 2;
+            $$ix += 2;
+            return ($op, $i1 << 8 | $i2);
+        }
+        else {
+            die "Bytecode stream error"
+        }
+    }
 );    
     
 sub read {

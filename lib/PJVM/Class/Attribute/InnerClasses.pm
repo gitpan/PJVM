@@ -33,7 +33,7 @@ __END__
 
 =head1 NAME
 
-PJVM::Class::Attribute::Exceptions -
+PJVM::Class::Attribute::InnerClasses -
 
 =head1 SYNOPSIS
 

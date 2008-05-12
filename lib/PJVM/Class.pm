@@ -47,7 +47,7 @@ sub new_from_io {
     my ($this_class, $super_class) = unpack("nn", $buff);
     $self->{this_class} = $this_class,
     $self->{super_class} = $super_class,
-    
+        
     # Read interfaces
     read $io, $buff, 2;
     my $interface_count = unpack("n", $buff);

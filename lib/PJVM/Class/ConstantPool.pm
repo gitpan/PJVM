@@ -40,20 +40,23 @@ use constant {
     
         my $buff;
         read $io, $buff, 2;
-        my $count = unpack("n", $buff);
- 
+        my $count = unpack("n", $buff) - 1;
+
         my $constants = [];
         if ($count) {
             my $ix = 1;
             my $tag;
-            while (--$count > 1) {
+            while ($count--) {
                 read $io, $buff, 1;        
                 my $tag = unpack("C", $buff);
                 die "Don't know how to read tag '${tag}'" unless exists $constant_readers{$tag};
             
                 my $constant = $constant_readers{$tag}->new_from_io($tag, $io);
                 $constants->[$ix++] = $constant;
-                $constants->[$ix++] = $constant if $constant->isa("PJVM::Class::ConstantPool::Extended");
+                if ($constant->isa("PJVM::Class::ConstantPool::Extended")) {
+                    $constants->[$ix++] = $constant;
+                    $count--;
+                }
             }
         }
         

@@ -49,19 +49,15 @@ sub load_class {
     
     die "Can't find '${fqcn}.class' in my classpath" unless $path;
     
-    my $data = slurp $path, binmode => ':raw';
-    die "Class '${fqcn}.class' appears to be empty.. FAIL" unless $data;
-    
-    my $class = $self->read_class($data);
+    open(my $io, "<:raw", $path) || die $!;
+    my $class = $self->read_class($io);
+    close($io);
     
     return $class;
 }
 
 sub read_class {
-    my ($self, $data) = @_;
-    
-    my $io = IO::Scalar->new(\$data);
-    
+    my ($self, $io) = @_;
     return PJVM::Class->new_from_io($io);
 }
 

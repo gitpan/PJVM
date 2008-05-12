@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 
-use File::Slurp qw(slurp);
 use File::Spec;
 use IO::Scalar;
 
@@ -11,8 +10,7 @@ use Test::More tests => 3;
 
 BEGIN { use_ok("PJVM::Class::ConstantPool"); }
 
-my $data = slurp(File::Spec->catfile("java", "test1.class"), binmode => ':raw');
-my $io = IO::Scalar->new(\$data);
+open(my $io, "<:raw", File::Spec->catfile("java", "test1.class")) || die $!;
 
 # Skip header stuff
 seek $io, 8, 0;

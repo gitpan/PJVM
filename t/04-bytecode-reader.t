@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 BEGIN { use_ok("PJVM::Bytecode::Reader"); }
 
@@ -22,3 +22,4 @@ my $code = $method->bytecode;
 
 my $ops = PJVM::Bytecode::Reader->read($code);
 
+is_deeply($ops, [[16,41],undef,[172]]);

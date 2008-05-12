@@ -5,6 +5,8 @@ Makefile.PL
 README
 java/test1.class
 java/test1.java
+java/test2.class
+java/test2.java
 lib/PJVM.pm
 lib/PJVM/Access.pm
 lib/PJVM/Bytecode/Reader.pm
@@ -24,8 +26,14 @@ lib/PJVM/Class/ConstantPool/Types.pm
 lib/PJVM/Class/Field.pm
 lib/PJVM/Class/Method.pm
 lib/PJVM/ClassLoader.pm
+lib/PJVM/Exceptions.pm
+lib/PJVM/ExecutionEngine/SimpleRunloop.pm
+lib/PJVM/Runtime.pm
+lib/PJVM/Runtime/Class.pm
 t/01-classloader.t
 t/02-class-constantpool.t
 t/03-class.t
 t/04-bytecode-reader.t
+t/05-runtime.t
+tests/dump_class.pl
 META.yml                                 Module meta-data (added by MakeMaker)

@@ -11,6 +11,7 @@ WriteMakefile(
         File::Slurp     => 0,
         Object::Tiny    => 0,
         Scalar::Util    => 0,
+        Test::Exception => 0,
     },
     LICENSE         => 'mit',
     ABSTRACT_FROM   => 'lib/PJVM.pm',
