@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 17;
 use Test::Exception;
 
 use PJVM::ClassLoader;
@@ -18,9 +18,12 @@ is_deeply([$class->interfaces], ["java/lang/Cloneable"]);
 
 # Fields
 my $fields = $class->fields;
-is (scalar @$fields, 2);
+is (scalar @$fields, 3);
 my @fields = sort { $a->signature cmp $b->signature } @$fields;
 my $field = shift @fields;
+is($field->name, "static_field1");
+is($field->signature, "I");
+$field = shift @fields;
 is($field->name, "field1");
 is($field->signature, "I");
 $field = shift @fields;

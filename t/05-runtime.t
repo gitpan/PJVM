@@ -16,6 +16,3 @@ ok(!defined $class);
 
 $class = $rt->load_class("test2");
 ok(defined $class);
-
-use Data::Dumper qw(Dumper);
-print STDERR Dumper($class);

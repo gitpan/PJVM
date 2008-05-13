@@ -13,6 +13,10 @@ sub compile {
     return $bytecode;
 }
 
+sub execute {
+    
+}
+
 1;
 __END__
 

@@ -5,6 +5,7 @@ use warnings;
 
 use Scalar::Util qw(weaken);
 
+use PJVM::Access qw(:flags);
 use PJVM::Class::Attribute;
 
 use Object::Tiny qw(
@@ -57,15 +58,29 @@ sub signature {
     return $signature->value;
 }
 
-sub bytecode {
+sub code {
     my $self = shift;
     
     # Locate first attribute which is a code
     for my $attribute (@{$self->attributes}) {
         if ($attribute->isa("PJVM::Class::Attribute::Code")) {
-            return $attribute->code;
+            return $attribute;
         }
+    }    
+    
+    if ($self->access_flags & ACC_NATIVE || $self->access_flags & ACC_ABSTRACT) {
+        return;
     }
+    
+    die "Method has no 'Code' attribute.. that is very very bad"
+}
+
+sub bytecode {
+    my $self = shift;
+    
+    # Locate first attribute which is a code
+    my $code = $self->code;
+    return $code->code if $code;
     
     return '';
 }

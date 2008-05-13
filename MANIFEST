@@ -2,7 +2,12 @@ Changes
 LICENSE
 MANIFEST
 Makefile.PL
+PJVM-0.01_02.tar.gz
 README
+java/arrays.class
+java/arrays.java
+java/classtest.class
+java/classtest.java
 java/test1.class
 java/test1.java
 java/test2.class
@@ -29,11 +34,19 @@ lib/PJVM/ClassLoader.pm
 lib/PJVM/Exceptions.pm
 lib/PJVM/ExecutionEngine/SimpleRunloop.pm
 lib/PJVM/Runtime.pm
+lib/PJVM/Runtime/Array.pm
 lib/PJVM/Runtime/Class.pm
+lib/PJVM/Runtime/Native/java/lang/Class.pm
+lib/PJVM/Runtime/Native/java/lang/Object.pm
+lib/PJVM/Runtime/Object.pm
+lib/PJVM/Types.pm
 t/01-classloader.t
 t/02-class-constantpool.t
 t/03-class.t
 t/04-bytecode-reader.t
 t/05-runtime.t
+t/06-runtime-class.t
+t/07-runtime-object.t
+t/08-runtime-run.t
 tests/dump_class.pl
 META.yml                                 Module meta-data (added by MakeMaker)

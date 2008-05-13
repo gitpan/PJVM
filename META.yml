@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                PJVM
-version:             0.01_02
+version:             0.01_03
 abstract:            Java virtual machine written in Perl
 license:             mit
 author:              
